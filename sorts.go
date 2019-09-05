@@ -1,5 +1,9 @@
 package main
 
+import (
+	"sync"
+)
+
 //BubleSort classic
 func BubleSort(input *[]int) {
 	var buff int
@@ -19,7 +23,7 @@ func BubleSort(input *[]int) {
 
 //QuickSort simple
 func QuickSort(input *[]int, left int, right int) {
-	var divideValue = (*input)[(left+right)/2]
+	var divideValue = (*input)[(left+right)>>1]
 	var i = left
 	var j = right
 	var buff int
@@ -44,6 +48,41 @@ func QuickSort(input *[]int, left int, right int) {
 	}
 	if i < right {
 		QuickSort(input, i, right)
+	}
+}
+
+//QuickSortWithGoroutines for benchmark
+func QuickSortWithGoroutines(input *[]int, left int, right int, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	var divideValue = (*input)[(left+right)>>1]
+	var i = left
+	var j = right
+	var buff int
+
+	for i <= j {
+		for (*input)[i] < divideValue {
+			i++
+		}
+		for (*input)[j] > divideValue {
+			j--
+		}
+		if i <= j {
+			buff = (*input)[i]
+			(*input)[i] = (*input)[j]
+			(*input)[j] = buff
+			i++
+			j--
+		}
+	}
+
+	if left < j {
+		wg.Add(1)
+		go QuickSortWithGoroutines(input, left, j, wg)
+	}
+	if i < right {
+		wg.Add(1)
+		go QuickSortWithGoroutines(input, i, right, wg)
 	}
 }
 
