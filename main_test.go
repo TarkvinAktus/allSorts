@@ -65,7 +65,7 @@ func Benchmark_bubble(b *testing.B) {
 
 func Benchmark_Quick(b *testing.B) {
 	var testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
-
+	//runtime.GOMAXPROCS(4)
 	for i := 0; i < b.N; i++ {
 		testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
 		QuickSort(&testArray, 0, len(testArray)-1)
@@ -82,7 +82,7 @@ func Benchmark_Quick(b *testing.B) {
 func Benchmark_Quick_Goroutines(b *testing.B) {
 	var testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
 	var wg sync.WaitGroup
-	runtime.GOMAXPROCS(4)
+	runtime.GOMAXPROCS(1)
 
 	for i := 0; i < b.N; i++ {
 		testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}

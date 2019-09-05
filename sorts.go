@@ -53,7 +53,8 @@ func QuickSort(input *[]int, left int, right int) {
 
 //QuickSortWithGoroutines for benchmark
 func QuickSortWithGoroutines(input *[]int, left int, right int, wg *sync.WaitGroup) {
-	defer wg.Done()
+	//defer wg.Done()
+	//Стоит дороже!
 
 	var divideValue = (*input)[(left+right)>>1]
 	var i = left
@@ -84,6 +85,7 @@ func QuickSortWithGoroutines(input *[]int, left int, right int, wg *sync.WaitGro
 		wg.Add(1)
 		go QuickSortWithGoroutines(input, i, right, wg)
 	}
+	wg.Done()
 }
 
 func main() {
