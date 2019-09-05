@@ -52,7 +52,7 @@ func QuickSort(input *[]int, left int, right int) {
 }
 
 //QuickSortWithGoroutines for benchmark
-func QuickSortWithGoroutines(input *[]int, left int, right int, wg *sync.WaitGroup) {
+func QuickSortWithGoroutines(input *[]int, left int, right int, wg *sync.WaitGroup, ch chan struct{}) {
 	//defer wg.Done()
 	//Стоит дороже!
 
@@ -78,14 +78,33 @@ func QuickSortWithGoroutines(input *[]int, left int, right int, wg *sync.WaitGro
 	}
 
 	if left < j {
-		wg.Add(1)
-		go QuickSortWithGoroutines(input, left, j, wg)
+		select {
+		case ch <- struct{}{}:
+			wg.Add(1)
+			go func() {
+				QuickSortWithGoroutines(input, left, j, wg, ch)
+				<-ch
+				wg.Done()
+			}()
+		default:
+			QuickSortWithGoroutines(input, left, j, wg, ch)
+
+		}
 	}
 	if i < right {
-		wg.Add(1)
-		go QuickSortWithGoroutines(input, i, right, wg)
+		select {
+		case ch <- struct{}{}:
+			wg.Add(1)
+			go func() {
+				QuickSortWithGoroutines(input, i, right, wg, ch)
+				<-ch
+				wg.Done()
+			}()
+		default:
+			QuickSortWithGoroutines(input, i, right, wg, ch)
+
+		}
 	}
-	wg.Done()
 }
 
 func main() {

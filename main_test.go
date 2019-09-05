@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"runtime"
 	"sync"
 	"testing"
 )
+
+var BenchaArrayLen = 10000000
 
 func Test_bubble(t *testing.T) {
 	var testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
@@ -34,9 +37,9 @@ func Test_Quick(t *testing.T) {
 func Test_Quick_Goroutines(t *testing.T) {
 	var testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
 	var wg sync.WaitGroup
+	ch := make(chan struct{}, 4)
 
-	wg.Add(1)
-	QuickSortWithGoroutines(&testArray, 0, len(testArray)-1, &wg)
+	QuickSortWithGoroutines(&testArray, 0, len(testArray)-1, &wg, ch)
 	wg.Wait()
 
 	for i := 0; i < len(testArray)-1; i++ {
@@ -48,10 +51,14 @@ func Test_Quick_Goroutines(t *testing.T) {
 }
 
 func Benchmark_bubble(b *testing.B) {
-	var testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
+	testArray := make([]int, BenchaArrayLen)
 
 	for i := 0; i < b.N; i++ {
-		testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
+		b.StopTimer()
+		for i := 0; i < BenchaArrayLen; i++ {
+			testArray[i] = rand.Intn(1000)
+		}
+		b.StartTimer()
 		BubleSort(&testArray)
 	}
 
@@ -64,10 +71,14 @@ func Benchmark_bubble(b *testing.B) {
 }
 
 func Benchmark_Quick(b *testing.B) {
-	var testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
-	//runtime.GOMAXPROCS(4)
+	testArray := make([]int, BenchaArrayLen)
+
 	for i := 0; i < b.N; i++ {
-		testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
+		b.StopTimer()
+		for i := 0; i < BenchaArrayLen; i++ {
+			testArray[i] = rand.Intn(1000)
+		}
+		b.StartTimer()
 		QuickSort(&testArray, 0, len(testArray)-1)
 	}
 
@@ -80,14 +91,18 @@ func Benchmark_Quick(b *testing.B) {
 }
 
 func Benchmark_Quick_Goroutines(b *testing.B) {
-	var testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
+
+	testArray := make([]int, BenchaArrayLen)
 	var wg sync.WaitGroup
-	runtime.GOMAXPROCS(1)
+	ch := make(chan struct{}, runtime.NumCPU())
 
 	for i := 0; i < b.N; i++ {
-		testArray = []int{435, 543, 435, 342, 543, 34, 532, 56594, 26, 73864, 267, 2, 1, 77, 8, 368, 686, 864, 3, 4}
-		wg.Add(1)
-		QuickSortWithGoroutines(&testArray, 0, len(testArray)-1, &wg)
+		b.StopTimer()
+		for i := 0; i < BenchaArrayLen; i++ {
+			testArray[i] = rand.Intn(1000)
+		}
+		b.StartTimer()
+		QuickSortWithGoroutines(&testArray, 0, len(testArray)-1, &wg, ch)
 		wg.Wait()
 	}
 
