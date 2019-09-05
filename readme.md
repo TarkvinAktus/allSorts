@@ -32,6 +32,7 @@ Array[1.000.000]
     Benchmark_Quick_Goroutines-4          30          48626596 ns/op          267072 B/op          0 allocs/op
 
 Array[10.000.000]
+
     Benchmark_Quick-4                      1        1005124600 ns/op        80003168 B/op          2 allocs/op
     Benchmark_Quick_Goroutines-4           2         519285800 ns/op        40001848 B/op          3 allocs/op
 
